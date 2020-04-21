@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	
+<properties resource="com/everyfarm/admin/db/db.properties"></properties>
+
+<typeAliases>
+	<typeAlias type="com.everyfarm.admin.dto.PagingDto" alias="PagingDto"/>
+	<typeAlias type="com.everyfarm.admin.dto.UpgradeListDto" alias="UpgradeListDto"/>
+	<typeAlias type="com.everyfarm.admin.dto.AuctionApprovalDto" alias="AuctionApprovalDto"/>
+	<typeAlias type="com.everyfarm.admin.dto.UserListDto" alias="UserListDto"/>
+	<typeAlias type="com.everyfarm.admin.dto.AdminFundListDto" alias="AdminFundListDto"/>
+	<typeAlias type="com.everyfarm.admin.dto.AdminBillListDto" alias="AdminBillListDto"/>
+	<typeAlias type="com.everyfarm.admin.dto.AdminWFDto" alias="AdminWFDto"/>
+</typeAliases>
+	
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+      </dataSource>
+    </environment>
+  </environments>
+  
+  <mappers>
+  	<mapper resource="com/everyfarm/admin/db/mapper.xml"/>
+  </mappers>
+  
+</configuration>

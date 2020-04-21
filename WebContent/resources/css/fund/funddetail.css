@@ -1,0 +1,88 @@
+@charset "UTF-8";
+
+.movehome{
+	margin: 100px 0px 0px 300px;
+}
+
+#home, #list{
+	color: gray;
+}
+
+#thumbnail{
+	width: 450px;
+	height: 400px;
+	margin: 30px 0px 0px 300px;
+}
+
+.thumbnailContent{
+	margin: -450px 0px 0px 900px;
+}
+
+hr{
+	width: 70%;
+	margin-left: 0px;
+}
+.thumbnailContent select{
+	width: 600px;
+	height: 35px;
+}
+
+#btn{
+	background: green;
+	width: 150px;
+	height: 50px;
+	border-radius: 10px;
+	font-weight: bold;
+	color: white;
+}
+
+.detailTitle{
+	font-size: 15px;
+}
+#deadLine{
+	color: lightseagreen;	
+	font-size: 40px;
+}
+
+.titleone{
+	font-size : 22px;
+	font-weight : bold;
+}
+
+.titletwo{
+	color: lightseagreen;
+	font-size: 40px;
+}
+
+.space{
+	margin-top: -2%;
+	margin-bottom: -2%;
+	
+}
+
+#notice{
+	width: 3%;
+	cursor: pointer;
+}
+table{
+	border-top: none;
+	border-bottom: none;
+	border-left: none;
+	border-right: none;
+	
+}
+table > tr> td{
+	background: #eae9e9;
+	width: 40%;
+}
+
+.bottom{
+	margin: 0% 0% 0% 20%;
+}
+#joinName{
+	font-size: 13pt;
+	
+}
+.detailBody{
+	margin: 0% 20% 0% 20%;
+}

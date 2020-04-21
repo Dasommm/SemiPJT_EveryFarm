@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="farmerauctiondetail">
+
+	<select id="selectallstatus" parameterType="hashmap" resultType="auctionDetailDto">
+		SELECT B.* 
+      FROM (SELECT A.*, ROWNUM AS RNUM
+      FROM (SELECT * FROM AUCTION INNER JOIN STOCK
+        ON AUCTION.stock_no = STOCK.stock_no WHERE MEM_ID = #{mem_id } and auc_status=2 ORDER BY auc_no DESC) A) B
+        WHERE RNUM BETWEEN #{startseq} AND #{endseq} 
+	</select>
+
+	<select id="totalpage" parameterType="String" resultType="Integer">
+		SELECT COUNT(*) AS TOTALPAGE FROM AUCTION INNER JOIN STOCK
+        ON AUCTION.stock_no = STOCK.stock_no WHERE auc_status=2 AND MEM_ID = #{mem_id}
+	</select>
+	
+	<select id="selectEndstatus" parameterType="hashmap" resultType="auctionDetailDto">
+	 SELECT B.* 
+      FROM (SELECT A.*, ROWNUM AS RNUM
+      FROM (SELECT * FROM AUCTION INNER JOIN STOCK
+        ON AUCTION.stock_no = STOCK.stock_no WHERE mem_id = #{mem_id} AND (auc_status = 3 OR auc_status = 4) ORDER BY auc_no DESC) A) B
+      WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	
+	<select id="EndStatustotalpage" parameterType="String" resultType="int">
+		SELECT COUNT(*) AS TOTALPAGE FROM AUCTION INNER JOIN STOCK
+        ON AUCTION.stock_no = STOCK.stock_no WHERE (auc_status=3 OR auc_status=4) AND MEM_ID = #{mem_id}
+	</select>
+	
+	<select id="updateStatus" parameterType="Integer" resultType="int">
+		UPDATE AUCTION SET auc_status = 4 WHERE auc_no = #{auc_no} 
+	</select>
+	
+	<select id="selectSendList" parameterType="hashmap" resultType="auctionDetailDto">
+		 SELECT B.* FROM (SELECT A.*, ROWNUM AS RNUM
+      		FROM (SELECT * FROM AUCTION INNER JOIN STOCK
+      		ON AUCTION.stock_no = STOCK.stock_no WHERE mem_id = #{mem_id} AND auc_status = 4) A) B
+      		WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	
+	<select id="sendListtotalPage" parameterType="String" resultType="int">
+		SELECT COUNT(*) AS TOTALPAGE FROM AUCTION INNER JOIN STOCK
+        ON AUCTION.stock_no = STOCK.stock_no WHERE auc_status=4 AND MEM_ID=#{mem_id}
+	</select>
+	
+	<select id="selectNotYetstatus" parameterType="hashmap" resultType="auctionDetailDto">
+		SELECT B.* FROM (SELECT A.*, ROWNUM AS RNUM
+      		FROM (SELECT * FROM AUCTION INNER JOIN STOCK
+      		ON AUCTION.stock_no = STOCK.stock_no WHERE mem_id = #{mem_id} AND auc_status = 1) A) B
+      		WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	
+	<select id="notYettotalPage" parameterType="String" resultType="int">
+		SELECT COUNT(*) AS TOTALPAGE FROM AUCTION INNER JOIN STOCK
+        ON AUCTION.stock_no = STOCK.stock_no WHERE auc_status=1 AND mem_id=#{mem_id}
+	</select>
+	
+</mapper>

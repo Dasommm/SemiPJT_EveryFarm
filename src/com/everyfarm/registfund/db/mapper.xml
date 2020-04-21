@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="insertfund">
+
+	<select id="registstock" parameterType="fundDto">
+		INSERT INTO STOCK VALUES(
+			STOCKSEQ.NEXTVAL,
+			#{mem_id},
+			#{stock_name},
+			#{stock_detail},
+			#{stock_kg},
+			#{stock_price},
+			#{stock_image},
+			#{stock_location},
+			#{stock_kind}
+		)
+	</select>
+
+	<select id="registfund" parameterType="fundDto">
+		INSERT INTO FUND VALUES(
+			FUNDSEQ.NEXTVAL,
+			(SELECT stock_no FROM (SELECT * FROM STOCK WHERE mem_id=#{mem_id} ORDER BY stock_no DESC) WHERE ROWNUM=1),
+			0,
+			#{fund_price},
+			1,
+			SYSDATE,
+			#{fund_endDate},
+			0
+		)
+	</select>
+</mapper>

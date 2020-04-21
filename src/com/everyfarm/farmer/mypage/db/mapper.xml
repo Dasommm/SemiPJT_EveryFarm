@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="farmermypage">
+
+	<select id="farmapplylist" parameterType="String" resultType="farmerMainDto">
+	SELECT C.* FROM (
+	SELECT B.*, ROWNUM AS RNUM FROM 
+	(SELECT MEM_ID, WFARM_KEY, WFARM_TITLE, MF_REGDATE, COUNT(*) AS COUNT FROM (SELECT M.MEM_ID, M.MF_KEY, W.WFARM_KEY, W.WFARM_TITLE, SUBSTR(M.MF_REGDATE,1,8) AS MF_REGDATE
+	FROM MEMFARM M, WEEKENDFARM W 
+	WHERE M.WFARM_KEY = W.WFARM_KEY AND W.MEM_ID=#{mem_id})A
+	GROUP BY A.MEM_ID, WFARM_KEY, WFARM_TITLE,MF_REGDATE ORDER BY MF_REGDATE DESC)B)C
+	WHERE RNUM BETWEEN 1 AND 3
+	</select>
+	
+	<select id="recentorder" parameterType="String" resultType="farmerMainDto">
+	SELECT B.* FROM (SELECT A.*, ROWNUM AS RNUM FROM (SELECT O.orderinfo_kind, S.stock_name, B.mem_id, P.pay_price, O.orderinfo_date 
+	FROM STOCK S, BILL B, ORDERINFO O, PAY P
+	WHERE S.stock_no = B.stock_no AND B.order_no = O.order_no AND O.order_no = P.order_no 
+	AND S.stock_no IN(
+	SELECT stock_no FROM STOCK WHERE mem_id = #{mem_id})
+	ORDER BY B.order_no DESC)A)B
+	WHERE RNUM BETWEEN 1 AND 3
+	</select>
+
+	<select id="recentRefund" parameterType="String" resultType="farmerMainDto">
+	SELECT B.* FROM (SELECT A.*, ROWNUM AS RNUM FROM (SELECT O.ORDER_NO, S.STOCK_NAME, P.PAY_PRICE, B.MEM_ID, O.ORDERINFO_DATE 
+	FROM STOCK S, BILL B, ORDERINFO O, PAY P
+	WHERE S.STOCK_NO = B.STOCK_NO
+	AND B.ORDER_NO = O.ORDER_NO
+	AND O.ORDER_NO = P.ORDER_NO
+	AND B.STOCK_NO IN (SELECT STOCK_NO FROM STOCK WHERE MEM_ID = #{mem_id})
+	AND O.ORDERINFO_STATUS = 3 AND O.ORDERINFO_KIND = 1
+	ORDER BY O.ORDERINFO_DATE DESC)A)B
+	WHERE RNUM BETWEEN 1 AND 3
+	</select>
+	
+	<select id="runningfund" parameterType="String" resultType="int">
+	SELECT COUNT(*) AS RUNNINGFUND FROM FUND INNER JOIN STOCK ON FUND.STOCK_NO = STOCK.STOCK_NO
+	WHERE STOCK.MEM_ID = #{mem_id} AND FUND.FUND_STATUS = 2
+	</select>
+	
+	<select id="standbyfund" parameterType="String" resultType="int">
+	SELECT COUNT(*) AS STANDBPYFUND FROM FUND INNER JOIN STOCK ON FUND.STOCK_NO = STOCK.STOCK_NO
+	WHERE STOCK.MEM_ID = #{mem_id} AND FUND.FUND_STATUS = 1
+	</select>
+	
+	<select id="runningauc" parameterType="String" resultType="int">
+	SELECT COUNT(*) AS RUNNINGAUC FROM AUCTION INNER JOIN STOCK ON AUCTION.STOCK_NO = STOCK.STOCK_NO
+	WHERE STOCK.MEM_ID = #{mem_id} AND AUCTION.AUC_STATUS = 2
+	</select>
+	
+	<select id="standbyauc" parameterType="String" resultType="int">
+	SELECT COUNT(*) AS STANDBPYAUC FROM AUCTION INNER JOIN STOCK ON AUCTION.STOCK_NO = STOCK.STOCK_NO
+	WHERE STOCK.MEM_ID = #{mem_id} AND AUCTION.AUC_STATUS = 1
+	</select>
+	
+</mapper>

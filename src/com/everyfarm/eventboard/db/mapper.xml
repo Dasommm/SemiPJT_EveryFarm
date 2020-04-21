@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="eventboard">
+	<select id="eventlist" resultType="eventDto" parameterType="eventpagingDto">
+		SELECT B.* 
+		FROM (SELECT A.*, ROWNUM AS RNUM
+		FROM (SELECT * FROM EVENTBOARD ORDER BY eve_regDate DESC) A) B
+		WHERE RNUM BETWEEN #{startseq } AND #{endseq }
+	</select>
+	<select id="totalpage" resultType="int">
+ 		SELECT COUNT(*) FROM EVENTBOARD
+ 	</select>
+ 	<insert id="insertboard" parameterType="eventDto">
+ 		INSERT INTO EVENTBOARD
+ 		VALUES(EVENTSEQ.NEXTVAL,#{eve_writer},#{eve_title},#{eve_content},sysdate,0,#{eve_img},#{eve_addr})
+ 	</insert>
+ 	<select id="eventdetail" resultType="eventDto" parameterType="Integer">
+ 		SELECT * FROM EVENTBOARD
+ 		WHERE eve_seq = #{eve_seq}
+ 	</select>
+ 	<update id="updatecount" parameterType="Integer">
+ 		UPDATE EVENTBOARD
+ 		SET eve_count = #{eve_count}
+ 		WHERE eve_seq = #{eve_seq}
+ 	</update>
+ 	<delete id="multidelete" parameterType="map">
+ 		DELETE FROM EVENTBOARD
+ 		WHERE eve_seq IN
+ 		<foreach collection="seqs" item="eve_seq" open="(" separator="," close=")">  
+ 			#{eve_seq}
+ 		</foreach>
+ 	</delete>
+</mapper>

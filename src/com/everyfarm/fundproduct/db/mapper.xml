@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="fund">
+
+<select id="selectList" resultType="fundDto" parameterType="fundPagingDto">
+SELECT B.*
+FROM(SELECT A.* , ROWNUM AS RNUM
+	FROM (SELECT * 
+		FROM STOCK S FULL OUTER JOIN FUND F
+		ON S.STOCK_NO = F.STOCK_NO
+		WHERE S.STOCK_NO = F.STOCK_NO AND FUND_STATUS = 2
+		ORDER BY FUND_REGDATE DESC)A )B
+WHERE RNUM BETWEEN #{from} AND #{to}
+</select>
+
+<select id="bestList" resultType="fundDto">
+SELECT *
+FROM(SELECT * FROM STOCK S FULL OUTER JOIN FUND F ON S.STOCK_NO = F.STOCK_NO 
+WHERE S.STOCK_NO = F.STOCK_NO AND FUND_STATUS =2
+ORDER BY FUND_JOIN DESC)
+WHERE ROWNUM <![CDATA[ <= ]]> 4
+</select>
+
+<select id="detail" resultType="fundDto" parameterType="int">
+SELECT * 
+FROM STOCK S FULL OUTER JOIN FUND F
+ON S.STOCK_NO = F.STOCK_NO
+WHERE S.STOCK_NO = F.STOCK_NO AND s.STOCK_NO=#{stock_no}
+ORDER BY FUND_REGDATE
+</select>
+
+<select id="totalpage" resultType="int">
+SELECT count(*) 
+FROM FUND INNER JOIN STOCK
+ON FUND.STOCK_NO = STOCK.STOCK_NO WHERE FUND_STATUS=2
+</select>
+
+<insert id="orderinput" parameterType="fundPayDto">
+INSERT INTO BILL (order_no, stock_no, mem_id)
+VALUES(BILLSEQ.NEXTVAL, #{stock_no}, #{mem_id})
+	<selectKey keyProperty="order_no" resultType="int" order="AFTER">
+		select billseq.currval as order_no from dual
+	</selectKey>
+</insert>
+
+<insert id="orderdetail" parameterType="fundPayDto">
+INSERT INTO ORDERINFO (ORDERINFO_NO, ORDER_NO, ORDERINFO_KG, ORDERINFO_STATUS, ORDERINFO_DATE, ORDERINFO_KIND)
+VALUES(ORDERINFOSEQ.NEXTVAL, #{order_no}, ${pay_price} , 1, SYSDATE,1)
+</insert>
+
+<select id="orderRes" parameterType="int">
+SELECT P.ORDER_NO, B.MEM_ID, P.PAY_PRICE 
+FROM BILL B INNER JOIN PAY P
+ON B.ORDER_NO = P.ORDER_NO
+WHERE B.ORDER_NO = #{order_no};
+</select>
+
+<insert id="payInput" parameterType="fundPayDto">
+INSERT INTO PAY (PAY_NO, ORDER_NO, PAY_PRICE)
+VALUES(PAYSEQ.NEXTVAL, #{order_no}, #{pay_price})
+</insert>
+
+<insert id="updateDetail" parameterType="fundPayDto">
+INSERT INTO ORDERINFO (ORDERINFO_NO, ORDER_NO, ORDERINFO_KG, ORDERINFO_STATUS, ORDERINFO_DATE, ORDERINFO_KIND)
+VALUES(ORDERINFOSEQ.NEXTVAL, #{order_no}, ${pay_price} , 2, SYSDATE,1)
+</insert>
+
+<update id="memJoinUpdate" parameterType="fundPayDto">
+UPDATE FUND
+SET FUND_JOIN = FUND_JOIN+1, FUND_CURRENTPRICE = FUND_CURRENTPRICE + #{pay_price}
+WHERE FUND_NO = #{fund_no}
+</update>
+
+<insert id="joinInsert" parameterType="fundPayDto">
+INSERT INTO MEMJOIN
+VALUES(MEMJOINSEQ.NEXTVAL, #{mem_id}, #{fund_no}, NULL, NULL, #{pay_price}, SYSDATE)
+</insert>
+
+<select id="deadAjax" resultType="fundDto" parameterType="hashmap">
+	  SELECT 
+       	TRUNC(EndDate - StartDate) as "day", 
+         TRUNC(((EndDate - StartDate) - TRUNC(EndDate - StartDate)) * 24) as "hours", 
+         FLOOR(((((EndDate - StartDate) -TRUNC(EndDate - StartDate)) * 24) 
+         - TRUNC(((EndDate - StartDate)-TRUNC(EndDate - StartDate)) * 24)) * 60) as "minutes" 
+  FROM (              
+        SELECT sysdate as StartDate,
+                       TO_DATE(fund_endDate,'rrrr-mm-dd hh24:mi:ss') as EndDate 
+             FROM fund WHERE fund_no = #{fund_no}
+        )
+
+</select>
+<update id="fundStatusUpdate" >
+UPDATE FUND
+SET FUND_STATUS = 3
+WHERE FUND_STATUS=2 AND FUND_ENDDATE <![CDATA[ < ]]> SYSDATE
+</update>
+
+<select id="finishPage" resultType="int">
+SELECT count(*) 
+FROM FUND INNER JOIN STOCK
+ON FUND.STOCK_NO = STOCK.STOCK_NO WHERE FUND_STATUS=3
+</select>
+
+<select id="finishList" parameterType="fundPagingDto" resultType="fundDto">
+SELECT B.*
+FROM(SELECT A.* , ROWNUM AS RNUM
+	FROM (SELECT * 
+		FROM STOCK S FULL OUTER JOIN FUND F
+		ON S.STOCK_NO = F.STOCK_NO
+		WHERE S.STOCK_NO = F.STOCK_NO AND FUND_STATUS = 3
+		ORDER BY FUND_REGDATE DESC)A )B
+WHERE RNUM BETWEEN #{from} AND #{to}
+</select>
+
+<select id="joinAjax" parameterType="int" resultType="fundDto">
+SELECT FUND_JOIN
+FROM FUND
+WHERE FUND_NO = #{fund_no}
+</select>
+
+<select id="priceAjax" parameterType="int" resultType="fundDto">
+SELECT FUND_CURRENTPRICE
+FROM FUND
+WHERE FUND_NO = #{fund_no}
+</select>
+
+<select id="joinMemName" parameterType="int" resultType="fundDto">
+SELECT MEM_ID
+FROM MEMJOIN 
+WHERE FUND_NO = #{fund_no}
+</select>
+</mapper>

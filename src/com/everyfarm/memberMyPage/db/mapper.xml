@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="memberMyPage">
+ 	<select id="selectMyInfo" resultType="memberDto" parameterType="String">
+ 		SELECT *
+ 		FROM MEMBER
+ 		WHERE mem_id= #{mem_id}
+ 	</select>
+ 	<update id="updateMyInfo" parameterType="memberDto">
+ 		UPDATE MEMBER
+ 		<set>
+ 			mem_pw = #{mem_pw},
+ 			mem_phone = #{mem_phone},
+ 			mem_email = #{mem_email},
+ 			mem_zonecode = #{mem_zonecode},
+ 			mem_addr = #{mem_addr},
+ 			mem_addretc = #{mem_addretc}
+ 		</set>
+ 		WHERE mem_id = #{mem_id}
+ 	</update>
+ 	<update id="memberDelete" parameterType="String">
+ 		UPDATE MEMBER
+ 		SET mem_drop = 'N'
+ 		WHERE mem_id = #{mem_id}
+ 	</update>
+ 	<select id="selectGrade" resultType="memberDto" parameterType="String">
+ 		SELECT mem_grade, mem_name, farmer_status, farmer_regdate
+ 		FROM MEMBER INNER JOIN FARMER
+ 		USING (mem_id)
+ 		WHERE mem_id=#{mem_id}
+ 	</select>
+ 	<insert id="applyGradeUp" parameterType="String">
+ 		INSERT INTO FARMER
+ 		VALUES(#{mem_id}, 1, SYSDATE)
+ 	</insert>
+ 	<select id="selectMyFarmList" resultType="myfarmlistDto" parameterType="String">
+ 		SELECT *
+		FROM WEEKENDFARM INNER JOIN MEMFARM USING(wfarm_key)
+		WHERE memfarm.mem_id=#{mem_id}
+		ORDER BY mf_regdate DESC
+ 	</select>
+ 	<select id="selectMyFundList" resultType="mypurchaselistDto" parameterType="mypurchaselistDto">
+ 		SELECT * 
+		FROM (SELECT order_no, max(orderinfo_status) AS orderinfo_status FROM ORDERINFO GROUP BY order_no) 
+		      INNER JOIN BILL using(order_no) INNER JOIN STOCK using(stock_no) INNER JOIN FUND using(stock_no) 
+		      INNER JOIN MEMJOIN using(fund_no)
+		WHERE bill.mem_id=#{mem_id}
+		ORDER BY memjoin_regDate DESC
+ 	</select>
+ 	<select id="pagingMyFundList" resultType="mypurchaselistDto" parameterType="mypurchaselistDto">
+ 		SELECT B.* 
+		FROM (SELECT A.*, ROWNUM AS RNUM
+		FROM (SELECT * 
+		FROM (SELECT order_no, max(orderinfo_status) AS orderinfo_status FROM ORDERINFO GROUP BY order_no) 
+		      INNER JOIN BILL using(order_no) INNER JOIN STOCK using(stock_no) INNER JOIN FUND using(stock_no) 
+		      INNER JOIN MEMJOIN using(fund_no)
+		WHERE bill.mem_id=#{mem_id}
+		ORDER BY memjoin_regDate DESC) A) B
+		WHERE RNUM BETWEEN #{startseq } AND #{endseq }
+ 	</select>
+ 	<select id="selectMyAuctionList" resultType="mypurchaselistDto" parameterType="String">
+ 		select * from stock inner join( 
+ 		select * 
+ 		from (select * from auction inner join memjoin on auction.auc_no = memjoin.auc_no
+              where memjoin_aucprice in(select auc_nowprice 
+                                        from auction inner join memjoin on auction.auc_no = memjoin.auc_no
+                                        where auc_status = 3)
+              )
+        where mem_id = #{mem_id}) using(stock_no) 
+        ORDER BY memjoin_regDate DESC
+ 	</select>
+ 	<select id="pagingMyAuctionList" resultType="mypurchaselistDto" parameterType="mypurchaselistDto">
+ 		SELECT B.* 
+		FROM (SELECT A.*, ROWNUM AS RNUM
+		FROM (select * from stock inner join( 
+ 		select * 
+ 		from (select * from auction inner join memjoin on auction.auc_no = memjoin.auc_no
+              where memjoin_aucprice in(select auc_nowprice 
+                                        from auction inner join memjoin on auction.auc_no = memjoin.auc_no
+                                        where auc_status = 3)
+              )
+        where mem_id = #{mem_id}) using(stock_no) left outer join  (select * from pay inner join 
+                      (select order_no, max(orderinfo_status) from orderinfo group by order_no) 
+   					  using(order_no) inner join bill using(order_no)) using(stock_no)
+        ORDER BY memjoin_regDate DESC) A) B
+		WHERE RNUM BETWEEN #{startseq } AND #{endseq }
+ 	</select>
+ 	<insert id="refund">
+ 		INSERT INTO ORDERINFO
+ 		VALUES(ORDERINFOSEQ.NEXTVAL,#{order_no},0,3,SYSDATE,1)
+ 	</insert>
+ 	<select id="selectMyPaymentList" resultType="mypaymentDto" parameterType="String">
+ 		SELECT * FROM
+		(select order_no, max(orderinfo_status) AS orderinfo_status, max(orderinfo_date) AS orderinfo_date
+		from ORDERINFO group by order_no) inner join BILL using(order_no) INNER JOIN PAY using(order_no) 
+		INNER JOIN STOCK using(stock_no) LEFT OUTER JOIN FUND using(stock_no) LEFT OUTER JOIN AUCTION using(stock_no)
+		WHERE bill.mem_id=#{mem_id}
+		ORDER BY order_no DESC
+ 	</select>
+ 	<select id="pagingMyPaymentList" resultType="mypaymentDto" parameterType="mypaymentDto">
+ 		SELECT B.* 
+		FROM (SELECT A.*, ROWNUM AS RNUM
+		FROM (SELECT * FROM
+		(select order_no, max(orderinfo_status) AS orderinfo_status, max(orderinfo_date) AS orderinfo_date
+		from ORDERINFO group by order_no) inner join BILL using(order_no) INNER JOIN PAY using(order_no) 
+		INNER JOIN STOCK using(stock_no) LEFT OUTER JOIN FUND using(stock_no) LEFT OUTER JOIN AUCTION using(stock_no)
+		WHERE bill.mem_id=#{mem_id}
+		ORDER BY order_no DESC) A) B
+		WHERE RNUM BETWEEN #{startseq } AND #{endseq }
+ 	</select>
+ 	<select id="orderAuction" resultType="mypaymentDto">
+ 		SELECT * FROM
+ 		STOCK INNER JOIN AUCTION USING(stock_no)
+ 		WHERE stock_no=#{stock_no}
+ 	</select>
+ 	<insert id="orderInput" parameterType="mypaymentDto">
+ 		INSERT INTO BILL
+ 		VALUES(BILLSEQ.NEXTVAL,#{stock_no},#{mem_id})
+ 		<selectKey keyProperty="order_no" resultType="int" order="AFTER">
+			select billseq.currval as order_no from dual
+		</selectKey>
+ 	</insert>
+ 	<insert id="orderDetail" parameterType="mypaymentDto">
+ 		INSERT INTO ORDERINFO
+ 		VALUES(ORDERINFOSEQ.NEXTVAL,#{order_no},#{stock_kg},1,SYSDATE,2)
+ 	</insert>
+ 	<insert id="payInput" parameterType="mypaymentDto">
+ 		INSERT INTO PAY
+ 		VALUES(PAYSEQ.NEXTVAL, #{order_no}, #{pay_price})
+ 	</insert>
+ 	<insert id="updateStatus">
+ 		INSERT INTO ORDERINFO
+ 		VALUES(ORDERINFOSEQ.NEXTVAL,#{order_no},#{stock_kg},2,SYSDATE,2)
+ 	</insert>
+ 	<select id="fundTotalpage" parameterType="String" resultType="int">
+ 		SELECT COUNT(*) AS TOTALPAGE FROM
+ 		(SELECT * 
+		FROM (SELECT order_no, max(orderinfo_status) AS orderinfo_status FROM ORDERINFO GROUP BY order_no) 
+		      INNER JOIN BILL using(order_no) INNER JOIN STOCK using(stock_no) INNER JOIN FUND using(stock_no) 
+		      INNER JOIN MEMJOIN using(fund_no)
+		WHERE bill.mem_id=#{mem_id})
+ 	</select>
+ 	<select id="auctionTotalpage" parameterType="String" resultType="int">
+ 		SELECT COUNT(*) AS TOTALPAGE FROM
+ 		(select * from stock inner join( 
+ 		select * 
+ 		from (select * from auction inner join memjoin on auction.auc_no = memjoin.auc_no
+              where memjoin_aucprice in(select auc_nowprice 
+                                        from auction inner join memjoin on auction.auc_no = memjoin.auc_no
+                                        where auc_status = 3)
+              )
+        where mem_id = #{mem_id}) using(stock_no))
+ 	</select>
+ 	<select id="paymentTotalpage" parameterType="String" resultType="int">
+ 		SELECT COUNT(*) AS TOTALPAGE FROM
+ 		(SELECT * FROM
+		(select order_no, max(orderinfo_status) AS orderinfo_status, max(orderinfo_date) AS orderinfo_date
+		from ORDERINFO group by order_no) inner join BILL using(order_no) INNER JOIN PAY using(order_no) 
+		INNER JOIN STOCK using(stock_no) LEFT OUTER JOIN FUND using(stock_no) LEFT OUTER JOIN AUCTION using(stock_no)
+		WHERE bill.mem_id=#{stock_no}
+		ORDER BY order_no DESC)
+ 	</select>
+</mapper>

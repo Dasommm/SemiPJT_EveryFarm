@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="supervisefarm">
+
+	<select id="myfarmlist" parameterType="hashmap" resultType="farmDto">
+	SELECT B.* FROM (SELECT A.*, ROWNUM AS RNUM FROM (SELECT WFARM_KEY, WFARM_TITLE, WFARM_TOTALAREA, WFARM_STATUS, WFARM_REGDATE, WFARM_PRICE, WFARM_ZONECODE, WFARM_ADDR 
+	FROM WEEKENDFARM 
+	WHERE MEM_ID = #{mem_id}
+	ORDER BY WFARM_KEY DESC)A) B
+	WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	
+	<select id="myfarmlistpage" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM WEEKENDFARM 
+		WHERE MEM_ID = #{mem_id}
+	</select>
+	
+	
+	<select id="sendfarmlist" parameterType="int" resultType="farmDto">
+	SELECT A.WFARM_TITLE, A.MEM_ID, A.MF_REGDATE, COUNT(MF_AREA) AS COUNT FROM 
+	(SELECT W.wfarm_title, M.MEM_ID, M.MF_AREA, SUBSTR(M.MF_REGDATE,1,8) AS MF_REGDATE
+	FROM MEMFARM M, WEEKENDFARM W
+	WHERE M.WFARM_KEY = W.WFARM_KEY AND M.WFARM_KEY = #{wfarm_key})A
+	GROUP BY A.MEM_ID, A.MF_REGDATE, A.WFARM_TITLE ORDER BY A.MF_REGDATE DESC
+	</select>
+	
+</mapper>

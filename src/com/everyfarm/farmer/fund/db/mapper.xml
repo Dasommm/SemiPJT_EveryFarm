@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="farmerfunddetail">
+	<select id="selectallstatus" parameterType="hashmap" resultType="fundDetailDto">
+	SELECT B.*
+	FROM (SELECT A.*, ROWNUM AS RNUM
+	FROM (SELECT * FROM FUND INNER JOIN STOCK 
+	ON FUND.stock_no = STOCK.stock_no WHERE MEM_ID=#{mem_id } AND fund_status=2 ORDER BY fund_no DESC) A) B
+	WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	
+	<select id="totalpage" parameterType="String" resultType="Integer">
+		SELECT COUNT(*) AS TOTALPAGE FROM FUND INNER JOIN STOCK
+		ON FUND.stock_no = STOCK.stock_no WHERE fund_status=2 AND MEM_ID = #{mem_id}
+	</select>
+
+	<select id="selectNotYetstatus" parameterType="hashmap" resultType="fundDetailDto">
+		SELECT B.* FROM (SELECT A.*, ROWNUM AS RNUM
+      		FROM (SELECT * FROM FUND INNER JOIN STOCK
+      		ON FUND.stock_no = STOCK.stock_no WHERE mem_id = #{mem_id} AND fund_status = 1) A) B
+      		WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	
+	<select id="notYettotalPage" parameterType="String">
+		SELECT COUNT(*) AS TOTALPAGE FROM FUND INNER JOIN STOCK
+        ON FUND.stock_no = STOCK.stock_no WHERE fund_status=1 AND mem_id=#{mem_id}
+	</select>
+	
+	<select id="selectEndstatus" parameterType="hashmap" resultType="fundDetailDto">
+	 SELECT B.* 
+      FROM (SELECT A.*, ROWNUM AS RNUM
+      FROM (SELECT * FROM FUND INNER JOIN STOCK
+        ON FUND.stock_no = STOCK.stock_no WHERE mem_id = #{mem_id} AND fund_status = 3 ORDER BY fund_no DESC) A) B
+      WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	
+	<select id="EndStatustotalpage" parameterType="String" resultType="int">
+		SELECT COUNT(*) AS TOTALPAGE FROM FUND INNER JOIN STOCK
+        ON FUND.stock_no = STOCK.stock_no WHERE fund_status=3 AND MEM_ID = #{mem_id}
+	</select>
+	
+	
+	<select id="refundPage" parameterType="String" resultType="int">
+		SELECT COUNT(B.order_no) AS TOTALPAGE 
+		FROM STOCK S, BILL B, ORDERINFO O, PAY P
+		WHERE S.stock_no = B.stock_no
+		AND B.order_no = O.order_no
+		AND O.order_no = P.order_no
+		AND S.mem_id = #{mem_id} AND O.orderinfo_kind = 1 AND (O.orderinfo_status=3 OR O.orderinfo_status=4)
+	</select>
+	
+	<select id="selectRefund" parameterType="hashmap" resultType="fundDetailDto">
+	SELECT B.* FROM (SELECT A.*, ROWNUM AS RNUM FROM (SELECT S.stock_name, B.mem_id, B.order_no, F.fund_no, O.orderinfo_date, O.orderinfo_status, P.pay_price 
+	FROM STOCK S, BILL B, ORDERINFO O, FUND F, PAY P
+	WHERE F.stock_no = S.stock_no
+	AND S.stock_no = B.stock_no
+	AND B.order_no = O.order_no
+	AND O.order_no = P.order_no 
+	AND S.mem_id = #{mem_id} AND (O.orderinfo_status=3 OR O.orderinfo_status=4) AND O.orderinfo_kind = 1 ORDER BY O.orderinfo_date DESC) A) B 
+	WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	
+	<select id="acceptrefund" parameterType="Integer" >
+		UPDATE ORDERINFO SET orderinfo_status = 4 WHERE order_no = #{order_no}
+	</select>
+	
+</mapper>

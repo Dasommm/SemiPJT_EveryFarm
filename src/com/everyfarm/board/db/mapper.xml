@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="board">
+
+<select id="boardList" resultType="boardDto">
+SELECT B.*
+FROM (SELECT A.*, ROWNUM AS RNUM
+	FROM (SELECT * FROM BOARD
+			WHERE BOARD_CATEGORY = 1 OR BOARD_CATEGORY =2
+			ORDER BY BOARD_REGDATE DESC)A)B
+WHERE RNUM BETWEEN #{from} AND #{to}
+</select>
+
+<select id="qaList" resultType="boardDto">
+SELECT B.*
+FROM (SELECT A.*, ROWNUM AS RNUM
+	FROM (SELECT * FROM BOARD
+			WHERE BOARD_CATEGORY = 3 OR BOARD_CATEGORY =4
+			ORDER BY BOARD_REGDATE DESC)A)B
+WHERE RNUM BETWEEN #{from} AND #{to}
+</select>
+
+<select id="totalpage" resultType="int">
+SELECT COUNT(*) FROM BOARD WHERE BOARD_CATEGORY =1 OR BOARD_CATEGORY=2
+</select>
+
+<select id="qaTotalpage" resultType="int">
+SELECT COUNT(*) FROM BOARD WHERE BOARD_CATEGORY =3 OR BOARD_CATEGORY=4
+</select>
+
+<select id="boardNotice" resultType="boardDto">
+SELECT B.*
+FROM (SELECT A.*, ROWNUM AS RNUM
+	FROM (SELECT * FROM BOARD
+			WHERE BOARD_CATEGORY = 1
+			ORDER BY BOARD_REGDATE DESC)A)B
+WHERE RNUM BETWEEN #{from} AND #{to}
+</select>
+
+<select id="cate1_totalpage" resultType="int">
+SELECT COUNT(*) FROM BOARD WHERE BOARD_CATEGORY =1
+</select>
+
+<select id="freeBoard" resultType="boardDto">
+SELECT B.*
+FROM (SELECT A.*, ROWNUM AS RNUM
+	FROM (SELECT * FROM BOARD
+			WHERE BOARD_CATEGORY =2
+			ORDER BY BOARD_REGDATE DESC)A)B
+WHERE RNUM BETWEEN #{from} AND #{to}
+</select>
+
+<select id="cate2_totalpage" resultType="int">
+SELECT COUNT(*) FROM BOARD WHERE BOARD_CATEGORY=2
+</select>
+
+<select id="boardDetail" resultType="boardDto" parameterType="int">
+SELECT * FROM BOARD WHERE BOARD_ID = #{board_id}
+</select>
+
+<insert id="boardInsert" parameterType="boardDto">
+INSERT INTO BOARD
+VALUES(BOARDSEQ.NEXTVAL, #{mem_id}, #{board_title}, 0, SYSDATE, '', #{board_category}, #{board_content})
+
+</insert>
+
+<update id="boardUpdate" parameterType="boardDto">
+UPDATE BOARD
+SET BOARD_CATEGORY = #{board_category}, BOARD_TITLE = #{board_title}, BOARD_CONTENT= #{board_content}
+WHERE BOARD_ID = #{board_id}
+</update>
+
+<delete id="boardDelete" parameterType="int">
+DELETE FROM BOARD
+WHERE BOARD_ID = #{board_id}
+</delete>
+
+<select id="bestNotice" resultType="boardDto">
+SELECT B.*
+FROM (SELECT A.*, ROWNUM AS RNUM
+	FROM (SELECT * FROM BOARD
+		WHERE BOARD_CATEGORY =1
+		ORDER BY BOARD_READCNT DESC)A)B
+WHERE RNUM BETWEEN 1 AND 3
+</select>
+
+<insert id="replyInsert" parameterType="boardDto">
+INSERT INTO REPLY
+VALUES (COMMENTSEQ.NEXTVAL, #{mem_id},#{board_id},#{comment_content},SYSDATE)
+</insert>
+
+<select id="replyAll" resultType="boardDto" parameterType="int">
+SELECT * FROM REPLY
+WHERE BOARD_ID = #{board_id}
+ORDER BY COMMENT_REGDATE
+</select>
+
+<delete id="replyDelete" parameterType="boardDto">
+DELETE FROM REPLY
+WHERE BOARD_ID = #{board_id} AND COMMENT_NO = #{comment_no}
+</delete>
+
+<delete id="deleteReplyAll" parameterType="int">
+DELETE FROM REPLY 
+WHERE BOARD_ID =#{board_id}
+</delete>
+
+<update id="replyUpdate" parameterType="boardDto">
+UPDATE REPLY SET COMMENT_CONTENT = #{comment_content}
+WHERE COMMENT_NO = #{comment_no}
+</update>
+
+<update id="boardViewPlus" parameterType="int">
+UPDATE BOARD SET BOARD_READCNT = BOARD_READCNT+1
+WHERE BOARD_ID = #{board_id}
+</update>
+
+<select id="replyCnt" resultType="int" parameterType="int">
+SELECT count(*)
+FROM REPLY
+WHERE BOARD_ID = #{board_id}
+</select>
+
+<delete id="multiDelete">
+DELETE FROM BOARD
+WHERE BOARD_ID IN
+<foreach collection="board_ids" item="board_id" open="(" separator="," close=")">
+	#{board_id}
+</foreach>
+</delete>
+
+<delete id="multiDeleteReply">
+DELETE FROM REPLY
+WHERE BOARD_ID IN
+<foreach collection="board_ids" item="board_id" open="(" separator="," close=")">
+	#{board_id}
+</foreach>
+</delete>
+
+
+<select id="cate3_totalpage" resultType="int">
+SELECT COUNT(*) FROM BOARD WHERE BOARD_CATEGORY=3
+</select>
+
+<select id="userQa" resultType="boardDto">
+SELECT B.*
+FROM (SELECT A.*, ROWNUM AS RNUM
+	FROM (SELECT * FROM BOARD
+			WHERE BOARD_CATEGORY =3
+			ORDER BY BOARD_REGDATE DESC)A)B
+WHERE RNUM BETWEEN #{from} AND #{to}
+</select>
+
+<select id="cate4_totalpage" resultType="int">
+SELECT COUNT(*) FROM BOARD WHERE BOARD_CATEGORY=4
+</select>
+<select id="farmerQa" resultType="boardDto">
+SELECT B.*
+FROM (SELECT A.*, ROWNUM AS RNUM
+	FROM (SELECT * FROM BOARD
+			WHERE BOARD_CATEGORY =4
+			ORDER BY BOARD_REGDATE DESC)A)B
+WHERE RNUM BETWEEN #{from} AND #{to}
+</select>
+</mapper>

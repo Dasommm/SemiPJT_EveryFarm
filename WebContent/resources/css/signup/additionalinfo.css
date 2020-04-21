@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+*{
+	margin:0px;
+	padding:0px;
+}
+input{
+	width: 300px;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid rosybrown;
+
+}
+section{
+	position:relative;
+	margin:0px;
+	padding:0px;
+
+}
+a{
+	color:black;
+	font-weight:bold;
+
+	
+}
+

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="admin">
+
+
+
+ 	<select id="totalpage_upgradelist" resultType="int">
+		SELECT COUNT(*) AS TOTALCOUNT 
+		FROM (SELECT * FROM MEMBER A, FARMER B
+			WHERE A.MEM_ID = B.MEM_ID) R 
+ 	</select>
+ 	
+ 	<select id="totalpage_auctionaprroval" resultType="int">
+		SELECT COUNT(*) AS TOTALCOUNT 
+		FROM (SELECT * FROM AUCTION A, STOCK B
+			WHERE A.STOCK_NO = B.STOCK_NO) R 
+ 	</select>
+ 	
+ 	 <select id="totalpage_userlist" resultType="int">
+		SELECT COUNT(*) AS TOTALCOUNT 
+		FROM MEMBER
+ 	</select>
+ 	
+ 	 <select id="totalpage_adminfundlist" resultType="int">
+		SELECT COUNT(*) AS TOTALCOUNT 
+		FROM FUND
+ 	</select>
+ 	
+ 	 <select id="totalpage_adminbilllist" resultType="int">
+		SELECT COUNT(*)
+		FROM STOCK S INNER JOIN BILL B ON S.STOCK_NO = B.STOCK_NO
+		INNER JOIN ORDERINFO O ON B.ORDER_NO = O.ORDER_NO
+		ORDER BY O.ORDER_NO DESC
+ 	</select>
+
+ 	 <select id="totalpage_adminwf" resultType="int">
+		SELECT COUNT(*)
+		FROM WEEKENDFARM
+ 	</select>
+
+
+
+ 	<select id="upgradelist" resultType="UpgradeListDto" parameterType="pagingDto">
+		SELECT R.* 
+		FROM (SELECT ROWNUM AS RNUM, A.MEM_ID, A.MEM_NAME, A.MEM_GRADE, B.FARMER_STATUS
+			FROM MEMBER A, FARMER B
+			WHERE A.MEM_ID = B.MEM_ID
+			AND A.MEM_DROP = 'y') R 
+		WHERE R.RNUM BETWEEN #{from} AND #{to}
+ 	</select>
+
+ 	<select id="selectOne">
+		SELECT * FROM MEMBER A, FARMER B
+		WHERE A.MEM_ID = B.MEM_ID AND A.MEM_ID=#{id}
+ 	</select>
+ 	
+ 	<select id="upgraderank_mem">
+		UPDATE FARMER SET FARMER_STATUS=2 WHERE MEM_ID=#{id}
+ 	</select>
+ 	
+ 	<select id="upgraderank_far">
+		UPDATE MEMBER SET MEM_GRADE=2 WHERE MEM_ID=#{id}
+ 	</select>
+
+ 	<select id="approvallist" resultType="AuctionApprovalDto" parameterType="pagingDto">
+		SELECT R.RNUM, R.MEM_ID, R.STOCK_NAME, R.AUC_STARTPRICE, R.AUC_REGDATE, R.AUC_ENDDATE, R.AUC_STATUS, R.AUC_NO
+		FROM (SELECT ROWNUM AS RNUM, A.*, B.*
+			FROM AUCTION A, STOCK B
+			WHERE A.STOCK_NO = B.STOCK_NO
+			ORDER BY A.AUC_REGDATE DESC) R 
+		WHERE R.RNUM BETWEEN #{from} AND #{to}
+ 	</select>
+ 	
+ 	<select id="realtime_approvallist" resultType="AuctionApprovalDto" parameterType="pagingDto">
+		SELECT ROWNUM AS RNUM, R.*
+		FROM	(
+				SELECT *
+				FROM STOCK S INNER JOIN AUCTION A ON S.STOCK_NO = A.STOCK_NO
+				WHERE A.AUC_STATUS = 2
+				ORDER BY A.AUC_REGDATE DESC
+				)R
+ 	</select>
+ 
+ 	<select id="auctionapproval">
+		UPDATE AUCTION SET AUC_STATUS=2 WHERE AUC_NO=#{no}
+ 	</select>
+
+ 	<select id="userlist" resultType="UserListDto" parameterType="pagingDto">
+		SELECT R.* 
+		FROM (SELECT ROWNUM AS RNUM, MEM_ID, MEM_NAME, MEM_PHONE, MEM_ZONECODE, MEM_ADDR, MEM_ADDRETC, MEM_EMAIL, MEM_GRADE, MEM_REGDATE, MEM_DROP
+			FROM MEMBER
+			) R 
+		WHERE R.RNUM BETWEEN #{from} AND #{to}
+ 	</select>
+ 	
+ 	 <select id="userlist_main" resultType="UserListDto">
+		SELECT R.* 
+		FROM (SELECT ROWNUM AS RNUM, MEM_ID, MEM_NAME, MEM_PHONE, MEM_ZONECODE, MEM_ADDR, MEM_ADDRETC, MEM_EMAIL, MEM_GRADE, MEM_REGDATE, MEM_DROP
+			FROM MEMBER
+			) R 
+		WHERE R.RNUM BETWEEN 1 AND 5
+ 	</select>
+ 	
+ 	 <select id="adminfundlist" resultType="AdminFundListDto" parameterType="pagingDto">
+		SELECT BB.*
+		FROM	(
+				SELECT 	ROWNUM AS RNUM, AA.*	
+				FROM	(
+				 		SELECT *
+						FROM FUND
+						ORDER BY FUND_REGDATE DESC
+						) AA
+				) BB		
+		WHERE BB.RNUM BETWEEN #{from} AND #{to}
+ 	</select>
+ 	
+ 	<select id="adminfundres">
+		UPDATE FUND SET FUND_STATUS=2 WHERE FUND_NO=#{no}
+ 	</select>
+ 	
+ 	 <select id="adminbilllist" resultType="AdminBillListDto" parameterType="pagingDto">
+		SELECT BB.*
+		FROM	(
+				SELECT 	ROWNUM AS RNUM, AA.*	
+				FROM	(
+						SELECT * 
+						FROM STOCK S INNER JOIN BILL B ON S.STOCK_NO = B.STOCK_NO
+						INNER JOIN ORDERINFO O ON B.ORDER_NO = O.ORDER_NO
+						ORDER BY O.ORDER_NO DESC
+						) AA
+				) BB		
+		WHERE BB.RNUM BETWEEN #{from} AND #{to}
+ 	</select>
+ 	
+ 	 <select id="adminbilllist_main" resultType="AdminBillListDto">
+		SELECT BB.*
+		FROM	(
+				SELECT 	ROWNUM AS RNUM, AA.*	
+				FROM	(
+						SELECT * 
+						FROM STOCK S INNER JOIN BILL B ON S.STOCK_NO = B.STOCK_NO
+						INNER JOIN ORDERINFO O ON B.ORDER_NO = O.ORDER_NO
+						ORDER BY O.ORDER_NO DESC
+						) AA
+				) BB		
+		WHERE BB.RNUM BETWEEN 1 AND 5
+ 	</select>
+ 	
+ 	 <select id="adminbillres">
+		UPDATE ORDERINFO SET ORDERINFO_STATUS=2 WHERE ORDER_NO=#{no}
+ 	</select>
+ 	
+ 	 <select id="adminwf" resultType="AdminWFDto" parameterType="pagingDto">
+		SELECT BB.*
+		FROM	(
+				SELECT 	ROWNUM AS RNUM, AA.*	
+				FROM	(
+						SELECT *
+						FROM WEEKENDFARM
+						ORDER BY WFARM_REGDATE DESC
+						) AA
+				) BB		
+		WHERE BB.RNUM BETWEEN #{from} AND #{to}
+ 	</select>
+
+ 	<select id="adminwfres">
+		UPDATE WEEKENDFARM SET WFARM_STATUS=2 WHERE WFARM_KEY=#{no}
+ 	</select>
+ 	
+ 	
+ 	<select id="stockKindCount" resultType="int">
+		SELECT COUNT(*) 
+		FROM STOCK 
+		WHERE STOCK_KIND = #{kindnumber}
+ 	</select>
+ 	
+ 	<select id="fundSumCurrentPrice" resultType="int">
+		SELECT SUM(FUND_CURRENTPRICE) FROM FUND WHERE FUND_STATUS = 2
+ 	</select>
+ 	
+ 	<select id="auctionSumCurrentPrice" resultType="int">
+		SELECT SUM(AUC_NOWPRICE) FROM AUCTION WHERE AUC_STATUS = 2
+ 	</select>
+ 	
+ 	<select id="fundCurrentMember" resultType="int">
+		SELECT SUM(FUND_JOIN) FROM FUND WHERE FUND_STATUS = 2
+ 	</select>
+ 	
+ 	<select id="auctionCurrentMember" resultType="int">
+		SELECT SUM(AUC_JOIN) FROM AUCTION WHERE AUC_STATUS = 2
+ 	</select>
+ 	
+ 	
+
+</mapper>

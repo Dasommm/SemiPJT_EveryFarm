@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="member">
+	
+	<select id="login" resultType="memberDto" parameterType="memberDto">
+		SELECT *
+		FROM MEMBER 
+		WHERE mem_id = #{mem_id} AND mem_pw = #{mem_pw} 
+		AND mem_drop = #{mem_drop} 
+	</select>
+	<select id="apiEmailChk" resultType="memberDto" parameterType="String">
+		 SELECT mem_email FROM MEMBER
+	     WHERE mem_id = #{api_id}
+	</select>
+  	<select id="idChk" resultType="memberDto" parameterType="String">
+		 SELECT * FROM MEMBER WHERE mem_id = #{mem_id} 
+	</select>
+	<select id="emailJunbokCh" resultType="memberDto" parameterType="String">
+		 SELECT * FROM MEMBER WHERE mem_email = #{mem_email} 
+	</select>
+	<insert id="signup" parameterType="memberDto">
+	     INSERT INTO MEMBER
+	     VALUES(#{mem_id},#{mem_pw},#{mem_name},#{mem_phone},#{mem_zonecode},#{mem_addr},#{mem_addretc},#{mem_email},1,sysdate,'y')
+	</insert>
+	<select id="searchId" resultType="memberDto" parameterType="memberDto">
+		SELECT mem_id FROM MEMBER
+		WHERE mem_name=#{mem_name} AND mem_email=#{mem_email} AND mem_phone=#{mem_phone}
+	</select>
+	<select id="searchPw" resultType="memberDto" parameterType="memberDto">
+		SELECT mem_pw FROM MEMBER
+		WHERE mem_id=#{mem_id} AND mem_name=#{mem_name} AND mem_email=#{mem_email} AND mem_phone=#{mem_phone}
+	</select>
+	<update id="tempPw" parameterType="memberDto">
+		UPDATE MEMBER
+		SET mem_pw=#{mem_pw} WHERE mem_id=#{mem_id}
+	</update>
+	<insert id="signupapi" parameterType="memberDto">
+	     INSERT INTO MEMBER
+	     VALUES(#{mem_id},#{mem_pw},#{mem_name},#{mem_phone},#{mem_zonecode},#{mem_addr},#{mem_addretc},#{mem_email},#{mem_grade},sysdate,'y')
+	</insert>
+	<select id="selectAll" resultType="memberDto" parameterType="String">
+		SELECT *
+		FROM MEMBER 
+		WHERE mem_id=#{mem_id}
+	</select>
+
+	
+</mapper>

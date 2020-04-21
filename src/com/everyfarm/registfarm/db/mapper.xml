@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="farm">
+	
+	<select id="regist" parameterType="farmDto">
+		INSERT INTO WEEKENDFARM VALUES(
+			WEEKENDFARMSEQ.NEXTVAL,
+			#{mem_id},
+			#{wfarm_title},
+			#{wfarm_zoneCode},
+			#{wfarm_addr},
+			#{wfarm_totalArea},
+			#{wfarm_price},
+			#{wfarm_status},
+			SYSDATE,
+			#{wfarm_image},
+			#{wfarm_content}
+		)
+	</select>
+	
+
+	
+</mapper>

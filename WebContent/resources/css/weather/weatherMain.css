@@ -1,0 +1,66 @@
+@charset "UTF-8";
+
+
+#background-pic{
+	width: 100%;
+	height: 600px;
+	
+}
+
+.weather_container{
+	margin-left: 30%;
+	margin-right: 30%;
+	height: 600px;
+	color: black;
+}
+
+.title{
+	font-size: 35pt;
+}
+
+.result {
+	margin-left: 10%;
+	margin-right: 10%;
+}
+.table_result td{
+    font-size: 15pt;
+    font-family: fantasy;
+    text-align: center;
+    	color: black;
+}
+.title_container{
+	font-weight: bold;
+
+	
+}
+#weather_img {
+    margin-left: 30%;
+    margin-right: 30%;
+}
+.result p{
+    margin-left: 20%;
+    margin-right: 10%;
+    text-align: right;
+    font-size: 10pt;
+}
+table tr, td{
+	padding-left: 3%;
+	padding-right: 3%;
+		color: black;
+}
+table{
+	width: 100%;
+	margin-bottom: 3%;
+	
+}
+
+.selectBox{
+    margin-left: 25%;
+    margin-right: 30%;
+    padding-bottom: 3%;
+}
+#weaview{
+    color: white;
+    background: black;
+    border-radius: 10px;
+}

@@ -1,0 +1,235 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: "Segoe UI";
+}
+
+#fundIntro{
+	width: 100%;
+}
+
+.fundSearch {
+	text-align: center;
+}
+
+li {
+    list-style: none;
+}
+
+.fixed-container {
+    max-width:  1170px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.btn{
+	
+	width: 200px; 
+	height: 35px; 
+	border-radius:10px; 
+	background:black; 
+	color:white; 
+	font-weight:bold;
+}
+#titleone{
+	font-weight: bold;
+    font-size: 20px;
+}
+
+.bestproduct{
+	text-align: center;
+    font-size: 35px;
+}
+
+
+.shop-list {
+    padding-top: 73px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 30px;
+    margin: 0px 0px 0px -200px;
+}
+
+.shop-list__item {
+	height: 480px;
+    border: 1px solid #e6e8f2;
+    border-radius: 10px;
+    display: grid;
+    position: relative;
+    transition:  0.5s ease;
+}
+
+.shop-list__item img {
+    margin-left: 7%;
+    margin-right: 5%;
+}
+
+.item-disc {
+  padding-top: 20px;
+}
+
+.item-disc:after {
+
+    position: absolute;
+    top: 302px;
+    left: 38%;
+    width: 84%;
+    height: 2px;
+    margin-left: -30%;
+    background: #ededfa;
+}
+
+#productprice{
+	color: brown;
+    font-weight: bold;
+    font-size: 25px;
+    margin-left: 15px;
+	
+}
+table{
+	    margin-top: 30px;
+	    background: #F6F6F6;
+        border-bottom: white;
+    border-top: white;
+    border-left: white;
+    border-right: white;
+    color: black;
+    font-weight: bold;
+    width: 350px;
+    text-align: center;
+  
+}
+.seller{
+    margin: 0px 0px 0px 12px;
+	color: darksalmon;
+	position: absolute;
+	font-size: 25px;
+	
+}
+
+
+#item-title {
+    margin-left: 18px;
+    color: #0f1a4d;
+    font-family: "Segoe UI";
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+
+.item-price-block {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+}
+
+.item-price {
+	margin-top: -6%;
+  display: grid;
+
+}
+
+
+
+.shop-list__item:hover {
+   transform: translateY(-8px);
+}
+
+
+/*페이징 시작*/
+.paging {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px 0;
+    position: relative;
+}
+ 
+.paging span, .paging a {
+    display: block;
+    width: auto;
+    margin: 4px;
+    padding: 8px;
+    background-color: #fff;
+    text-decoration: none;
+    text-align: center;
+    line-height: 16px;
+}
+ 
+ 
+/* ページ番号 */
+.paging .pager{
+    width: 32px;
+    border: 1px solid #ddd;
+}
+ 
+/* ホバー時 & 現在のページ */
+.paging a:hover,
+.paging .current{
+    color: #fff;
+    border-color: #333;
+    background-color: #333;
+}
+ 
+.paging .str{
+    font-weight: bold;
+}
+/* 前へ */
+.paging a.prev {
+    margin-right: 16px;
+}
+/* 次へ */
+.paging a.next {
+    margin-left: 16px;
+}
+/* Page x / y */
+.paging span.page_num {
+    display: none;
+}
+/* 페이징 끝*/
+
+.item-finish {
+	  padding-top: 20px;
+  position: relative;
+}
+
+.image {
+  opacity: 1;
+  display: block;
+  transition: .5s ease;
+  backface-visibility: hidden;
+}
+
+.middle {
+  transition: .5s ease;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.item-finish:hover .image {
+  opacity: 0.3;
+}
+
+.item-finish:hover .middle {
+  opacity: 1;
+}
+
+.text {
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  padding: 16px 32px;
+}
+
+.finish{
+	color: lightgray;
+}

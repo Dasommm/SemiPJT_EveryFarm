@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rentfarm">
+ 	<select id="farmlist" resultType="farmDto" parameterType="farmpagingDto">
+		SELECT B.* 
+		FROM (SELECT A.*, ROWNUM AS RNUM
+		FROM (SELECT * FROM WEEKENDFARM INNER JOIN MEMBER
+        ON WEEKENDFARM.mem_id = Member.mem_id WHERE wfarm_status = '2' ORDER BY wfarm_regDate DESC) A) B
+		WHERE RNUM BETWEEN #{startseq } AND #{endseq }
+ 	</select>
+ 	<select id="totalpage" resultType="int">
+ 		SELECT COUNT(*) FROM WEEKENDFARM INNER JOIN MEMBER
+        ON WEEKENDFARM.mem_id = MEMBER.mem_id AND wfarm_status = '2'
+ 	</select>
+ 	<select id="searchlist" resultType="farmDto" parameterType="hashmap">
+		SELECT B.* 
+		FROM (SELECT A.*, ROWNUM AS RNUM
+		FROM (SELECT * FROM WEEKENDFARM INNER JOIN MEMBER
+        ON WEEKENDFARM.mem_id = MEMBER.mem_id WHERE wfarm_addr LIKE '%${wfarm_addr}%' AND wfarm_status = '2' ORDER BY wfarm_regDate DESC) A) B
+		WHERE RNUM BETWEEN #{startseq} AND #{endseq}
+	</select>
+	<select id="searchAreatotalpage" resultType="int" parameterType="String">
+		SELECT COUNT(*) AS TOTALPAGE FROM WEEKENDFARM INNER JOIN MEMBER
+        ON WEEKENDFARM.mem_id = MEMBER.mem_id WHERE wfarm_addr LIKE '%${zoneval}%' AND wfarm_status = '2'
+	</select>
+	<select id="farmdetail" resultType="farmDto" parameterType="Integer">
+	    SELECT * FROM
+        (SELECT * FROM WEEKENDFARM INNER JOIN MEMBER
+        ON WEEKENDFARM.mem_id = MEMBER.mem_id WHERE wfarm_key = #{wfarm_key})
+	</select>
+	<select id="selectMemInfo" resultType="farmDto" parameterType="String">
+		SELECT *
+		FROM MEMBER 
+		WHERE mem_id = #{mem_id}
+	</select>
+	<insert id="insertSelectedFarm" parameterType="hashmap">
+		INSERT INTO MEMFARM
+		VALUES(MEMFARMSEQ.NEXTVAL,#{mem_id},#{wfarm_key},sysdate,#{array})
+	</insert>
+	<select id="selectMf_Area" resultType="farmDto" parameterType="Integer">
+		SELECT mf_area FROM MEMFARM WHERE wfarm_key = #{sendWfarm_key}
+	</select>
+	<insert id="insertletter" parameterType="farmDto">
+		INSERT INTO LETTERS
+		VALUES(LETTERSSEQ.NEXTVAL,#{mem_id},#{letter_sender},#{letter_title},#{letter_content},sysdate,0)
+	</insert>
+	<select id="selectTotalSize" resultType="int" parameterType="Integer">
+		SELECT wfarm_totalArea FROM WEEKENDFARM
+		WHERE wfarm_key = #{wfarm_key}
+	</select>
+	<select id="alreadySelectedCnt" resultType="int" parameterType="Integer"> 
+		SELECT COUNT(*) FROM MEMFARM
+		WHERE wfarm_key = #{wfarm_key}
+	</select>
+	<update id="updateStatus" parameterType="hashmap">
+		UPDATE WEEKENDFARM
+		SET wfarm_status = #{wfarm_status}
+		WHERE wfarm_key = #{wfarm_key}
+	</update>
+</mapper>

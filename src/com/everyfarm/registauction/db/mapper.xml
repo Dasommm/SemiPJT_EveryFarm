@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="insertauction">
+
+	<select id="registstock" parameterType="auctionDto">
+		INSERT INTO STOCK VALUES(
+			STOCKSEQ.NEXTVAL, 
+			#{mem_id}, 
+			#{stock_name}, 
+			#{stock_detail}, 
+			#{stock_kg}, 
+			0, 
+			#{stock_image}, 
+			#{stock_location}, 
+			#{stock_kind}
+		)
+	</select>
+	
+	<select id="registauction" parameterType="auctionDto">
+		INSERT INTO AUCTION (auc_no, stock_no, auc_startPrice,auc_nowprice, auc_status, auc_regDate, auc_endDate) VALUES (
+			AUCTIONSEQ.NEXTVAL, 
+			(SELECT stock_no FROM (SELECT * FROM STOCK WHERE mem_id=#{mem_id} ORDER BY stock_no DESC) WHERE ROWNUM=1), 
+			#{auc_startPrice},
+			0,
+			1,
+			SYSDATE,
+			#{auc_endDate}
+		)
+	</select>
+	
+
+</mapper>
